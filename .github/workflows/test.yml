@@ -20,13 +20,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  test-linux:
     strategy:
       matrix:
         python_version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        shell: ['bash', 'zsh', 'csh', 'tcsh', 'ksh', 'fish']
+    runs-on: ubuntu-latest
     steps:
+      - name: Install shell
+        run : |
+          apt install -y ${{ matrix.shell }}
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
@@ -35,12 +38,14 @@ jobs:
       - name: Install
         run: |
           pip install ".[test]"
-      - name: Test set configuration
+      - name: Make user
         run: |
-          if [ "$RUNNER_OS" == "Linux" ] || [ "$RUNNER_OS" == "macOS" ]; then
-            user_bin=$(python -c 'import os,sysconfig;print(sysconfig.get_path("scripts",f"{os.name}_user"))')
-            export PATH=$(echo $PATH | sed "s|:${user_bin}||")
-          fi
+          useradd -m mb110
+          chsh -s $(which ${{ matrix.shell }}) mb110
+      - name: Test in user
+          su - mb110
+          echo $PATH
           python -m puser
-      - name: Show environment
-        run: env
+          exit
+          su - mb110
+          echo $PATH

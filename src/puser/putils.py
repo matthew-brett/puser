@@ -24,17 +24,23 @@ def get_paths():
     return [Path(p).resolve() for p in path.split(os.path.pathsep)]
 
 
-class Configger:
+class ZshConfigger:
+
+    config_name = '.zshrc'
 
     def __init__(self):
         self.sp_rel = USER_SCRIPT_PATH.relative_to(USER_PATH)
         self.config_path = self.get_config_path()
 
     def get_config_path(self):
-        return None
+        return USER_PATH / self.config_name
 
     def write_config(self):
-        raise NotImplementedError
+        return self._apply_config(f'''
+# Inserted by puser
+# Add Python --user script directory to PATH
+export PATH="$PATH:${{HOME}}/{self.sp_rel}"
+''')
 
     def _apply_config(self, out_text):
         config_path = self.config_path
@@ -45,28 +51,35 @@ class Configger:
         return f'Configuration written to {config_path}'
 
 
-class BashishConfigger(Configger):
+class CshConfigger(ZshConfigger):
 
-    def __init__(self, shell):
-        self.shell = shell
-        super().__init__()
-
-    def get_config_path(self):
-        if self.shell == 'bash':
-            return USER_PATH / ('.bash_profile' if IS_MAC else '.bashrc')
-        if self.shell == 'zsh':
-            return USER_PATH / '.zshrc'
-        raise RuntimeError(f'Do not recognize shell "{self.shell}"')
+    config_name = '.cshrc'
 
     def write_config(self):
-        return self._apply_config(f'''
+        return self._apply_config(rf'''
 # Inserted by puser
 # Add Python --user script directory to PATH
-export PATH="$PATH:${{HOME}}/{self.sp_rel}"
+setenv PATH "$PATH\:${{HOME}}/{self.sp_rel}"
 ''')
 
 
-class FishConfigger(Configger):
+class TcshConfigger(CshConfigger):
+
+    config_name = '.tcshrc'
+
+
+class KshConfigger(ZshConfigger):
+
+    config_name = '.kshrc'
+
+
+class BashConfigger(ZshConfigger):
+
+    def get_config_path(self):
+        return USER_PATH / ('.bash_profile' if IS_MAC else '.bashrc')
+
+
+class FishConfigger(CshConfigger):
 
     def get_config_path(self):
         cfg_home = Path(os.environ.get('XDG_CONFIG_HOME', USER_PATH / '.config'))
@@ -82,13 +95,22 @@ fish_add_path --append --path {{$HOME}}/{self.sp_rel}
 ''')
 
 
+SHELL_CONFIGGERS = dict(
+    csh=CshConfigger,
+    tcsh=TcshConfigger,
+    zsh=ZshConfigger,
+    bash=BashConfigger,
+    ksh=KshConfigger,
+    fish=FishConfigger,
+)
+
+
 def make_configger():
     shell = get_mac_shell() if IS_MAC else get_unix_shell()
-    if shell == 'fish':
-        return FishConfigger()
-    elif shell in ('bash', 'zsh'):
-        return BashishConfigger(shell)
-    raise RuntimeError(f'I do not know to configure shell "{shell}"')
+    configger = SHELL_CONFIGGERS.get(shell)
+    if configger is None:
+        raise RuntimeError(f'I do not know to configure shell "{shell}"')
+    return configger()
 
 
 def get_mac_shell():

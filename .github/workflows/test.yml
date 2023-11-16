@@ -55,6 +55,7 @@ jobs:
           sudo su - $TEST_USER -c 'pip install "git+https://github.com/${{ github.repository }}"'
           sudo su - $TEST_USER -c 'python -m puser'
           sudo su - $TEST_USER -c 'echo $PATH'
+          sudo su - $TEST_USER -c 'puser-config'
       # Uncomment to get SSH access for testing
       - name: Setup tmate session
         if: failure()

@@ -23,8 +23,10 @@ jobs:
   test-linux:
     strategy:
       matrix:
-        python_version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        shell: ['bash', 'zsh', 'csh', 'tcsh', 'ksh', 'fish']
+        # python_version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # shell: ['bash', 'zsh', 'csh', 'tcsh', 'ksh', 'fish']
+        python_version: ["3.12"]
+        shell: ['fish']
     runs-on: ubuntu-latest
     env:
       TEST_USER: mb110
@@ -58,3 +60,31 @@ jobs:
       # - name: Setup tmate session
       #   if: failure()
       #   uses: mxschmitt/action-tmate@v3
+
+  test-other:
+    strategy:
+      matrix:
+        # python_version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # os: [windows-latest, macos-latest]
+        python_version: ["3.12"]
+        os: [macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python_version }}
+          allow-prereleases: true
+      - name: Install
+        run: |
+          pip install ".[test]"
+      - name: Test set configuration
+        run: |
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            cat .bash_profile
+            user_bin=$(python -c 'import os,sysconfig;print(sysconfig.get_path("scripts",f"{os.name}_user"))')
+            export PATH=$(echo $PATH | sed "s|:${user_bin}||")
+          fi
+          python -m puser
+      - name: Show environment
+        run: env

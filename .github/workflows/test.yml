@@ -26,6 +26,8 @@ jobs:
         python_version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         shell: ['bash', 'zsh', 'csh', 'tcsh', 'ksh', 'fish']
     runs-on: ubuntu-latest
+    env:
+      TEST_USER: mb110
     steps:
       - name: Install shell
         run : |
@@ -41,10 +43,10 @@ jobs:
           pip install ".[test]"
       - name: Make user
         run: |
-          useradd -m mb110
-          chsh -s $(which ${{ matrix.shell }}) mb110
+          sudo useradd -m $TEST_USER
+          sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
       - name: Run in user
         run: |
-          sudo -u mb110 echo $PATH
-          sudo -u mb110 python -m puser
-          sudo -u mb110 echo $PATH
+          sudo -u $TEST_USER echo $PATH
+          sudo -u $TEST_USER python -m puser
+          sudo -u $TEST_USER echo $PATH

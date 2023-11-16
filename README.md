@@ -6,7 +6,7 @@ installs.
 Use with:
 
 ```bash
-puser-config
+python -m puser
 ```
 
 from your terminal.

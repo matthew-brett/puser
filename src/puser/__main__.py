@@ -22,7 +22,7 @@ def main():
     us_path = get_user_script_path()
     if (not args.allow_existing) and (us_path in get_paths()):
         sys.stderr.write(f'{us_path} already appears to be on your PATH\n')
-        sys.exit(1)
+        sys.exit(0)
     print(set_path_config(us_path))
     print("""\
 Now close all terminals and start a new terminal to load new configuration.""")

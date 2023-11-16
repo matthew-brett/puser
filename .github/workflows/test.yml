@@ -23,7 +23,7 @@ jobs:
   test:
     strategy:
       matrix:
-        python_version: ["3.9", "3.10", "3.11", "3.12"]
+        python_version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -35,6 +35,10 @@ jobs:
       - name: Install
         run: |
           pip install ".[test]"
+      - name: Remove runner user dir from PATH
+        if: runner.os == 'Linux'
+        run: |
+          echo $GITHUB_PATH | sed 's#:/home/runner/.local/bin##' > $GITHUB_PATH
       - name: Show environment
         run: env
       - name: Test

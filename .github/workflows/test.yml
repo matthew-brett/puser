@@ -45,7 +45,7 @@ jobs:
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
       - name: Run in user
         run: |
-          sudo -u $TEST_USER echo $PATH
-          sudo -u $TEST_USER pip install "git+https://github.com/${{ github.repository }}"
-          sudo -u $TEST_USER python -m puser
-          sudo -u $TEST_USER echo $PATH
+          su - $TEST_USER -c 'echo $PATH'
+          su - $TEST_USER -c 'pip install "git+https://github.com/${{ github.repository }}"'
+          su - $TEST_USER -c 'python -m puser'
+          su - $TEST_USER -c 'echo $PATH'

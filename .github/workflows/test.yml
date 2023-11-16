@@ -39,6 +39,10 @@ jobs:
         with:
           python-version: ${{ matrix.python_version }}
           allow-prereleases: true
+      - name: Clean XDG_CONFIG_HOME
+        run: |
+          sed 's/^XDG_CONFIG_HOME.*$//' /etc/environment > clean_environment
+          sudo mv clean_environment /etc/environment
       - name: Make user
         run: |
           sudo useradd -m $TEST_USER

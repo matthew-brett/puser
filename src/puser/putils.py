@@ -10,11 +10,9 @@ from pathlib import Path
 
 USER_PATH = Path('~').expanduser()
 IS_MAC = sys.platform == 'darwin'
-
-
-def get_user_script_path():
-    script_fname = sysconfig.get_path("scripts",f"{os.name}_user")
-    return Path(script_fname).resolve()
+USER_SCRIPT_PATH = Path(
+    sysconfig.get_path("scripts",f"{os.name}_user")
+).resolve()
 
 
 def getout(s):
@@ -24,6 +22,73 @@ def getout(s):
 def get_paths():
     path = os.path.os.environ['PATH']
     return [Path(p).resolve() for p in path.split(os.path.pathsep)]
+
+
+class Configger:
+
+    def __init__(self):
+        self.sp_rel = USER_SCRIPT_PATH.relative_to(USER_PATH)
+        self.config_path = self.get_config_path()
+
+    def get_config_path(self):
+        return None
+
+    def write_config(self):
+        raise NotImplementedError
+
+    def _apply_config(self, out_text):
+        config_path = self.config_path
+        config_text = config_path.read_text() if config_path.is_file() else ''
+        if out_text in config_text:
+            return f'Configuration already exists in {config_path}'
+        config_path.write_text(f'{config_text}\n{out_text}')
+        return f'Configuration written to {config_path}'
+
+
+class BashishConfigger(Configger):
+
+    def __init__(self, shell):
+        self.shell = shell
+        super().__init__()
+
+    def get_config_path(self):
+        if self.shell == 'bash':
+            return USER_PATH / ('.bash_profile' if IS_MAC else '.bashrc')
+        if self.shell == 'zsh':
+            return USER_PATH / '.zshrc'
+        raise RuntimeError(f'Do not recognize shell "{self.shell}"')
+
+    def write_config(self):
+        return self._apply_config(f'''
+# Inserted by puser
+# Add Python --user script directory to PATH
+export PATH="$PATH:${{HOME}}/{self.sp_rel}"
+''')
+
+
+class FishConfigger(Configger):
+
+    def get_config_path(self):
+        cfg_home = Path(os.environ.get('XDG_CONFIG_HOME', USER_PATH / '.config'))
+        cfg_d = cfg_home / 'fish' / 'conf.d'
+        if not cfg_d.is_dir():
+            cfg_d.mkdir(parents=True)
+        return cfg_d / 'pip_user_path.fish'
+
+    def write_config(self):
+        return self._apply_config(f'''
+# Inserted by puser
+fish_add_path --append --path {{$HOME}}/{self.sp_rel}
+''')
+
+
+def make_configger():
+    shell = get_mac_shell() if IS_MAC else get_unix_shell()
+    if shell == 'fish':
+        return FishConfigger()
+    elif shell in ('bash', 'zsh'):
+        return BashishConfigger(shell)
+    raise RuntimeError(f'I do not know to configure shell "{shell}"')
 
 
 def get_mac_shell():
@@ -37,17 +102,7 @@ def get_unix_shell():
     return shell_info.split(':')[-1].split('/')[-1]
 
 
-def get_posix_configfile():
-    shell = get_mac_shell() if IS_MAC else get_unix_shell()
-    if shell == 'bash':
-        return USER_PATH / ('.bash_profile' if IS_MAC else '.bashrc')
-    elif shell == 'zsh':
-        return USER_PATH / '.zshrc'
-    else:
-        raise RuntimeError(f'Unexpected shell {shell}')
-
-
-def set_windows_path_env(site_path):
+def set_windows_path_env():
     ps_exe = getout('where powershell')
     var_type = '[System.EnvironmentVariableTarget]::User'
     user_path = getout(
@@ -56,22 +111,5 @@ def set_windows_path_env(site_path):
     getout(
         [ps_exe, '-command',
         '[Environment]::SetEnvironmentVariable("PATH",'
-         f'"{user_path};{site_path}", {var_type})'])
-
-
-def set_path_config(site_path):
-    if sys.platform == 'win32':
-        set_windows_path_env(site_path)
-        return
-    sp_rel = site_path.relative_to(USER_PATH)
-    out_text = f'''
-# Inserted by configure_shell
-# Add Python --user script directory to PATH
-export PATH="$PATH:${{HOME}}/{sp_rel}"
-'''
-    config_path = get_posix_configfile()
-    config_text = config_path.read_text()
-    if out_text in config_text:
-        return f'Configuration already exists in {config_path}'
-    config_path.write_text(f'{config_text}\n{out_text}')
-    return f'Configuration written to {config_path}'
+         f'"{user_path};{USER_SCRIPT_PATH}", {var_type})'])
+    return 'Configured Windows USER PATH environment variable'

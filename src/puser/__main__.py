@@ -5,7 +5,8 @@
 import sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-from .putils import get_paths, set_path_config, get_user_script_path
+from .putils import (get_paths, USER_SCRIPT_PATH, set_windows_path_env,
+                     make_configger)
 
 
 def get_parser():
@@ -19,11 +20,12 @@ def get_parser():
 def main():
     parser = get_parser()
     args = parser.parse_args()
-    us_path = get_user_script_path()
-    if (not args.allow_existing) and (us_path in get_paths()):
-        sys.stderr.write(f'{us_path} already appears to be on your PATH\n')
+    if (not args.allow_existing) and (USER_SCRIPT_PATH in get_paths()):
+        sys.stderr.write(
+            f'{USER_SCRIPT_PATH} already appears to be on your PATH\n')
         sys.exit(0)
-    print(set_path_config(us_path))
+    print(set_windows_path_env() if sys.platform == 'win32'
+          else make_configger().write_config())
     print("""\
 Now close all terminals and start a new terminal to load new configuration.""")
 

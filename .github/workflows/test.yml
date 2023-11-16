@@ -44,5 +44,3 @@ jobs:
           python -m puser
       - name: Show environment
         run: env
-      - name: Show environment again
-        run: env

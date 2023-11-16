@@ -42,10 +42,8 @@ jobs:
         run: |
           useradd -m mb110
           chsh -s $(which ${{ matrix.shell }}) mb110
-      - name: Test in user
-          su - mb110
-          echo $PATH
-          python -m puser
-          exit
-          su - mb110
-          echo $PATH
+      - name: Run in user
+        run: |
+          sudo -u mb110 echo $PATH
+          sudo -u mb110 python -m puser
+          sudo -u mb110 echo $PATH

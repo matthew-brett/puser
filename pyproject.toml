@@ -21,3 +21,8 @@ Home = "https://github.com/matthew-brett/puser"
 
 [project.scripts]
 puser-config = "puser.__main__:main"
+
+[project.optional-dependencies]
+test = [
+    'pytest>=7.2',
+]

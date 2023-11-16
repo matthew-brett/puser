@@ -84,7 +84,7 @@ jobs:
             echo "Bash profile"
             cat ~/.bash_profile
             echo "BashRC"
-            cat ~/.bash_profile
+            cat ~/.bashrc
             echo "End of .bashrc"
             user_bin=$(python -c 'import os,sysconfig;print(sysconfig.get_path("scripts",f"{os.name}_user"))')
             export PATH=$(echo $PATH | sed "s|:${user_bin}||")

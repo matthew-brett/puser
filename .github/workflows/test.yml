@@ -33,20 +33,19 @@ jobs:
         run : |
           sudo apt update
           sudo apt install -y ${{ matrix.shell }}
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python_version }}
           allow-prereleases: true
-      - name: Install
-        run: |
-          pip install ".[test]"
       - name: Make user
         run: |
           sudo useradd -m $TEST_USER
+      - name: Set shell
+        run: |
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
       - name: Run in user
         run: |
           sudo -u $TEST_USER echo $PATH
+          sudo -u $TEST_USER pip install "git+${{ github.repository }}"
           sudo -u $TEST_USER python -m puser
           sudo -u $TEST_USER echo $PATH

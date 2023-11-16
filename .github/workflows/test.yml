@@ -46,6 +46,6 @@ jobs:
       - name: Run in user
         run: |
           sudo -u $TEST_USER echo $PATH
-          sudo -u $TEST_USER pip install "git+${{ github.repository }}"
+          sudo -u $TEST_USER pip install "git+https://github.com/${{ github.repository }}"
           sudo -u $TEST_USER python -m puser
           sudo -u $TEST_USER echo $PATH

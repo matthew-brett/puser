@@ -35,14 +35,14 @@ jobs:
       - name: Install
         run: |
           pip install ".[test]"
-      - name: Remove runner user dir from PATH
-        if: runner.os == 'Linux'
+      - name: Test set configuration
         run: |
-          echo $GITHUB_PATH | sed 's#:/home/runner/.local/bin##' > $GITHUB_PATH
+          if [ "$RUNNER_OS" == "Linux" ] || [ "$RUNNER_OS" == "macOS" ]; then
+            user_bin=$(python -c 'import os,sysconfig;print(sysconfig.get_path("scripts",f"{os.name}_user"))')
+            export PATH=$(echo $PATH | sed "s|:${user_bin}||")
+          fi
+          python -m puser
       - name: Show environment
         run: env
-      - name: Test
-        run: |
-          python -m puser
       - name: Show environment again
         run: env

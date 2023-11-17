@@ -74,15 +74,18 @@ jobs:
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
       - name: Run in user
         run: |
-          sudo -i -u $TEST_USER env | grep PATH
-          sudo -i -u $TEST_USER python3 -m pip install git+https://github.com/${{ github.repository }}
-          sudo -i -u $TEST_USER python3 -m puser
-          sudo -i -u $TEST_USER env | grep PATH
-          sudo -i -u $TEST_USER puser-config
+          su - $TEST_USER
+          env
+          exit
+          # sudo -i -u $TEST_USER env | grep PATH
+          # sudo -i -u $TEST_USER python3 -m pip install git+https://github.com/${{ github.repository }}
+          # sudo -i -u $TEST_USER python3 -m puser
+          # sudo -i -u $TEST_USER env | grep PATH
+          # sudo -i -u $TEST_USER puser-config
       # Uncomment to get SSH access for testing
-      - name: Setup tmate session
-        if: failure()
-        uses: mxschmitt/action-tmate@v3
+      # - name: Setup tmate session
+      #   if: failure()
+      #   uses: mxschmitt/action-tmate@v3
 
   test-windows:
     strategy:

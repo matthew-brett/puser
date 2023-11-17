@@ -66,14 +66,14 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo useradd -m $TEST_USER
+            # Inconvenient short-circuit for interactive shells on Debian.
+            rm /home/$TEST_USER/.bashrc
           elif [ "$RUNNER_OS" == "macOS" ]; then
             sudo sysadminctl -addUser $TEST_USER -password foobar
           fi
       - name: Set shell
         run: |
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
-        run: |
-
       - name: Run in user
         run: |
           SHELL_NAME=$(sudo -u $TEST_USER echo $SHELL)

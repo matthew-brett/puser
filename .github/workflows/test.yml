@@ -83,9 +83,9 @@ jobs:
           sudo -u $TEST_USER ${SHELL_NAME} -i -c env | grep PATH
           sudo -u $TEST_USER ${SHELL_NAME} -i -c puser-config
       # Uncomment to get SSH access for testing
-      # - name: Setup tmate session
-      #   if: failure()
-      #   uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        if: failure()
+        uses: mxschmitt/action-tmate@v3
 
   test-windows:
     strategy:

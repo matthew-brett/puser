@@ -74,7 +74,7 @@ jobs:
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
       - name: Run in user
         run: |
-          su - $TEST_USER
+          sudo su - $TEST_USER
           env
           exit
           # sudo -i -u $TEST_USER env | grep PATH

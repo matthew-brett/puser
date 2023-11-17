@@ -75,7 +75,7 @@ jobs:
       - name: Run in user
         run: |
           sudo -i -u $TEST_USER env | grep PATH
-          sudo -i -u $TEST_USER pip3 install git+https://github.com/${{ github.repository }}
+          sudo -i -u $TEST_USER python3 -m pip install git+https://github.com/${{ github.repository }}
           sudo -i -u $TEST_USER python3 -m puser
           sudo -i -u $TEST_USER env | grep PATH
           sudo -i -u $TEST_USER puser-config

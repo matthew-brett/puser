@@ -86,7 +86,7 @@ jobs:
           SHELL_NAME=$(sudo -u $TEST_USER echo $SHELL)
           echo "Shell name: ${SHELL_NAME}"
           ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c env | grep PATH
-          sudo -u $TEST_USER python3 -m pip install git+https://github.com/${{ github.repository }}
+          sudo -u $TEST_USER python3 -m pip install --user git+https://github.com/${{ github.repository }}
           sudo -u $TEST_USER python3 -m puser
           ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c env | grep PATH
           ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c puser-config

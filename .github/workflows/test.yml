@@ -84,11 +84,11 @@ jobs:
       - name: Run in user
         run: |
           SHELL_NAME=$(sudo -u $TEST_USER echo $SHELL)
-          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c env | grep PATH
-          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c python3 -m pip install git+https://github.com/${{ github.repository }}
-          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c python3 -m puser
-          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c env | grep PATH
-          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c puser-config
+          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c env | grep PATH
+          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c python3 -m pip install git+https://github.com/${{ github.repository }}
+          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c python3 -m puser
+          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c env | grep PATH
+          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c puser-config
       # Uncomment to get SSH access for testing
       - name: Setup tmate session
         if: failure()

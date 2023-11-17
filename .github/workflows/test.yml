@@ -27,25 +27,36 @@ jobs:
         # shell: ['bash', 'zsh', 'csh', 'tcsh', 'ksh', 'fish']
         python_version: ["3.12"]
         shell: ['fish']
-    runs-on: ubuntu-latest
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     env:
       TEST_USER: mb110
     steps:
       - name: Install shell
         run : |
-          sudo apt update
-          sudo apt install -y ${{ matrix.shell }}
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt update
+            sudo apt install -y ${{ matrix.shell }}
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install ${{ matrix.shell }}
+          fi
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python_version }}
           allow-prereleases: true
       - name: Clean XDG_CONFIG_HOME
+        # fish depends on this variable being empty or correctly set.
         run: |
           sed 's/^XDG_CONFIG_HOME.*$//' /etc/environment > clean_environment
           sudo mv clean_environment /etc/environment
+        if: runner.os == 'Linux'
       - name: Make user
         run: |
-          sudo useradd -m $TEST_USER
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo useradd -m $TEST_USER
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            sudo sysadminctl -addUser $TEST_USER -password foobar
+          fi
       - name: Set shell
         run: |
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
@@ -61,14 +72,11 @@ jobs:
       #   if: failure()
       #   uses: mxschmitt/action-tmate@v3
 
-  test-other:
+  test-windows:
     strategy:
       matrix:
-        # python_version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        # os: [windows-latest, macos-latest]
-        python_version: ["3.12"]
-        os: [macos-latest]
-    runs-on: ${{ matrix.os }}
+        python_version: ["3.8", "3.12"]
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -80,15 +88,9 @@ jobs:
           pip install ".[test]"
       - name: Test set configuration
         run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            echo "Bash profile"
-            cat ~/.bash_profile
-            echo "BashRC"
-            cat ~/.bashrc
-            echo "End of .bashrc"
-            user_bin=$(python -c 'import os,sysconfig;print(sysconfig.get_path("scripts",f"{os.name}_user"))')
-            export PATH=$(echo $PATH | sed "s|:${user_bin}||")
-          fi
+          env
           python -m puser
       - name: Show environment
         run: env
+      - name: Test user script
+        run: puser-config

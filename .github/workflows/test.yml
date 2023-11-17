@@ -67,7 +67,7 @@ jobs:
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo useradd -m $TEST_USER
             # Inconvenient short-circuit for interactive shells on Debian.
-            rm /home/$TEST_USER/.bashrc
+            sudo rm /home/$TEST_USER/.bashrc
           elif [ "$RUNNER_OS" == "macOS" ]; then
             sudo sysadminctl -addUser $TEST_USER -password foobar
           fi

@@ -24,12 +24,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # python_version: ["3.8", "3.12"]
-        # shell: ['bash', 'zsh', 'csh', 'tcsh', 'ksh', 'fish']
-        # os: [ubuntu-latest, macos-latest]
-        python_version: ["3.8"]
-        shell: ['bash']
-        os: [ubuntu-latest]
+        python_version: ["3.8", "3.12"]
+        shell: ['bash', 'zsh', 'csh', 'tcsh', 'ksh', 'fish']
+        os: [ubuntu-latest, macos-latest]
         exclude:
           # No formula for csh on Homebrew
           - os: macos-latest

@@ -37,7 +37,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       TEST_USER: mb110
-      GH_WF: "~/.github/workflows"
+      GH_WF: ".github/workflows"
     steps:
       - name: Install shell
         run : |

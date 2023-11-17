@@ -56,6 +56,12 @@ jobs:
           sed 's/^XDG_CONFIG_HOME.*$//' /etc/environment > clean_environment
           sudo mv clean_environment /etc/environment
         if: runner.os == 'Linux'
+      - name: Set users Python
+        # This only set to Python above for runner user by default.
+        run: |
+          ln -s $(which python3) /usr/local/bin/python3
+          ln -s $(which python) /usr/local/bin/python
+        if: runner.os == 'Linux'
       - name: Make user
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then

@@ -85,9 +85,9 @@ jobs:
         run: |
           SHELL_NAME=$(sudo -u $TEST_USER echo $SHELL)
           echo "Shell name: ${SHELL_NAME}"
-          sudo -u $TEST_USER ${SHELL_NAME} -i -c env | grep PATH
-          sudo -u $TEST_USER ${SHELL_NAME} -i -c python3 -m pip install git+https://github.com/${{ github.repository }}
-          sudo -u $TEST_USER ${SHELL_NAME} -i -c python3 -m puser
+          ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c env | grep PATH
+          sudo -u $TEST_USER python3 -m pip install git+https://github.com/${{ github.repository }}
+          sudo -u $TEST_USER python3 -m puser
           ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c env | grep PATH
           ssh -o StrictHostKeyChecking=no -i sshkey $TEST_USER@localhost ${SHELL_NAME} -c puser-config
       # Uncomment to get SSH access for testing

@@ -47,6 +47,7 @@ jobs:
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install ${{ matrix.shell }}
           fi
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python_version }}
@@ -83,11 +84,11 @@ jobs:
           SHELL_NAME=$(sudo -u $TEST_USER echo $SHELL)
           echo "Shell name: ${SHELL_NAME}"
           source $GH_WF/ssh_func.sh
-          ssh_user ${SHELL_NAME} -c env | grep PATH
+          ssh_user env | grep PATH
           sudo -u $TEST_USER python3 -m pip install --user git+https://github.com/${{ github.repository }}
           sudo -u $TEST_USER python3 -m puser
-          ssh_user ${SHELL_NAME} -c env | grep PATH
-          ssh_user ${SHELL_NAME} -c puser-config
+          ssh_user env | grep PATH
+          ssh_user puser-config
       # Uncomment to get SSH access for testing
       - name: Setup tmate session
         if: failure()

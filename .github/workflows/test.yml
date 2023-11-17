@@ -74,14 +74,21 @@ jobs:
       - name: Set shell
         run: |
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
+      - name: Set up SSH
+        run: |
+          ssh-keygen -b 2048 -t rsa -f sshkey -q -N ""
+          SSH_DIR=/home/$TEST_USER/.ssh
+          sudo mkdir $SSH_DIR
+          sudo cp sshkey.pub $SSH_DIR/authorized_keys
+          sudo chown -R $TEST_USER:$TEST_USER $SSH_DIR
       - name: Run in user
         run: |
           SHELL_NAME=$(sudo -u $TEST_USER echo $SHELL)
-          sudo -u $TEST_USER ${SHELL_NAME} -i -c env | grep PATH
-          sudo -u $TEST_USER ${SHELL_NAME} -i -c python3 -m pip install git+https://github.com/${{ github.repository }}
-          sudo -u $TEST_USER ${SHELL_NAME} -i -c python3 -m puser
-          sudo -u $TEST_USER ${SHELL_NAME} -i -c env | grep PATH
-          sudo -u $TEST_USER ${SHELL_NAME} -i -c puser-config
+          ssh -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c env | grep PATH
+          ssh -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c python3 -m pip install git+https://github.com/${{ github.repository }}
+          ssh -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c python3 -m puser
+          ssh -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c env | grep PATH
+          ssh -i sshkey $TEST_USER@localhost ${SHELL_NAME} -i -c puser-config
       # Uncomment to get SSH access for testing
       - name: Setup tmate session
         if: failure()

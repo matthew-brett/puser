@@ -68,11 +68,11 @@ jobs:
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
       - name: Run in user
         run: |
-          sudo su - $TEST_USER -c 'echo $PATH'
-          sudo su - $TEST_USER -c 'pip3 install "git+https://github.com/${{ github.repository }}"'
-          sudo su - $TEST_USER -c 'python3 -m puser'
-          sudo su - $TEST_USER -c 'echo $PATH'
-          sudo su - $TEST_USER -c 'puser-config'
+          sudo -i -u $TEST_USER env | grep PATH
+          sudo -i -u $TEST_USER pip3 install git+https://github.com/${{ github.repository }}
+          sudo -i -u $TEST_USER python3 -m puser
+          sudo -i -u $TEST_USER env | grep PATH
+          sudo -i -u $TEST_USER puser-config
       # Uncomment to get SSH access for testing
       - name: Setup tmate session
         if: failure()

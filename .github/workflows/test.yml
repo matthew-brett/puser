@@ -68,6 +68,9 @@ jobs:
             sudo useradd -m $TEST_USER
             # Inconvenient short-circuit for interactive shells on Debian.
             sudo rm /home/$TEST_USER/.bashrc
+            # Fix zsh initalization.
+            sudo chmod 755 /usr/share/zsh
+            sudo chmod 755 /usr/share/zsh/vendor-completions
           elif [ "$RUNNER_OS" == "macOS" ]; then
             sudo sysadminctl -addUser $TEST_USER -password foobar
             # Allow ssh access.
@@ -92,9 +95,9 @@ jobs:
           ssh_user env | grep PATH
           ssh_user puser-config
       # Uncomment to get SSH access for testing
-      - name: Setup tmate session
-        if: failure()
-        uses: mxschmitt/action-tmate@v3
+      # - name: Setup tmate session
+      #   if: failure()
+      #   uses: mxschmitt/action-tmate@v3
 
   test-windows:
     strategy:

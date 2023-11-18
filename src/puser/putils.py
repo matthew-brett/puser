@@ -75,8 +75,7 @@ class KshConfigger(ZshConfigger):
 
 class BashConfigger(ZshConfigger):
 
-    def get_config_path(self):
-        return USER_PATH / ('.bash_profile' if IS_MAC else '.bashrc')
+    config_name = '.bashrc'
 
 
 class FishConfigger(CshConfigger):

@@ -90,8 +90,8 @@ jobs:
           source $GH_WF/ssh_func.sh
           ssh_user env | grep PATH
           echo "Test user is $TEST_USER"
-          sudo -i -u $TEST_USER python3 -m pip install --user git+https://github.com/${{ github.repository }}
-          sudo -i -u $TEST_USER python3 -m puser
+          ssh_user python3 -m pip install --user git+https://github.com/${{ github.repository }}
+          ssh_user python3 -m puser
           ssh_user env | grep PATH
           ssh_user puser-config
       # Uncomment to get SSH access for testing

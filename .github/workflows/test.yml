@@ -62,6 +62,10 @@ jobs:
           ln -s $(which python3) /usr/local/bin/python3
           ln -s $(which python) /usr/local/bin/python
         if: runner.os == 'Linux'
+      - name: Test mac sudo
+        run: |
+          sudo whoami
+        if: runner.os == 'macOS'
       - name: Make user
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then

@@ -10,8 +10,7 @@ fi
 username=$1
 userid=$2
 usergroup=${3:-20}
-userfullname=$4
-echo $username, $userid, $usergroup, $userfullname
+userfullname=${4:-$username}
 
 . /etc/rc.common
 dscl . create /Users/$username
@@ -23,5 +22,6 @@ dscl . create /Users/$username NFSHomeDirectory /Users/$username
 cp -R /System/Library/User\ Template/English.lproj /Users/$username
 chown -R $username:staff /Users/$username
 # Give ssh access: https://superuser.com/a/958774
-sudo dseditgroup -o edit -t user -a $username com.apple.access_ssh
+dseditgroup -o edit -t user -a $username com.apple.access_ssh
 
+echo "Created user '$username', user id: $userid"

@@ -82,18 +82,17 @@ jobs:
       - name: Set shell
         run: |
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
-      - name: Set up SSH
-        run: |
-          source $GH_WF/setup_ssh.sh
-      - name: Run in user
-        run: |
-          source $GH_WF/ssh_func.sh
-          ssh_user env | grep PATH
-          echo "Test user is $TEST_USER"
-          ssh_user python3 -m pip install --user git+https://github.com/${{ github.repository }}
-          ssh_user python3 -m puser
-          ssh_user env | grep PATH
-          ssh_user puser-config
+      - name: Run as user
+        uses: stefanv/run-as-user-action@main
+        with:
+          commands: |
+            echo $PATH
+            python3 -m pip install --user git+https://github.com/${{ github.repository }}
+            python3 -m puser
+            echo $PATH
+            puser-config
+          user: $TEST_USER
+          shell: ${{ matrix.shell }}
       # Uncomment to get SSH access for testing
       # - name: Setup tmate session
       #   if: failure()

@@ -83,7 +83,7 @@ jobs:
         run: |
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
       - name: Install puser
-        uses: stefanv/run-as-user-action@main
+        uses: matthew-brett/run-as-user-action@931dac4
         with:
           commands: |
             echo $PATH
@@ -92,7 +92,7 @@ jobs:
           user: $TEST_USER
           shell: ${{ matrix.shell }}
       - name: Test puser
-        uses: stefanv/run-as-user-action@main
+        uses: matthew-brett/run-as-user-action@931dac4
         with:
           commands: |
             echo $PATH

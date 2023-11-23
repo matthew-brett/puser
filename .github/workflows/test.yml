@@ -82,13 +82,19 @@ jobs:
       - name: Set shell
         run: |
           sudo chsh -s $(which ${{ matrix.shell }}) $TEST_USER
-      - name: Run as user
+      - name: Install puser
         uses: stefanv/run-as-user-action@main
         with:
           commands: |
             echo $PATH
             python3 -m pip install --user git+https://github.com/${{ github.repository }}
             python3 -m puser
+          user: $TEST_USER
+          shell: ${{ matrix.shell }}
+      - name: Test puser
+        uses: stefanv/run-as-user-action@main
+        with:
+          commands: |
             echo $PATH
             puser-config
           user: $TEST_USER

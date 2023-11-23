@@ -72,7 +72,7 @@ jobs:
             sudo chmod 755 /usr/share/zsh
             sudo chmod 755 /usr/share/zsh/vendor-completions
           elif [ "$RUNNER_OS" == "macOS" ]; then
-            sudo $GH_WF/make_mac_user $TEST_USER 600
+            sudo $GH_WF/make_mac_user.sh $TEST_USER 600
             # Allow ssh access.
             sudo /usr/sbin/dseditgroup -o edit -a ${TEST_USER} -t user com.apple.access_ssh
             # Configure for homebrew

@@ -76,8 +76,7 @@ jobs:
             # Allow ssh access.
             sudo /usr/sbin/dseditgroup -o edit -a ${TEST_USER} -t user com.apple.access_ssh
             # Configure for homebrew
-            echo "export PATH=\"\$PATH:$(brew --prefix)/bin\"" > /tmp/bash_profile
-            HOMEDIR=$( getent passwd "$TEST_USER" | cut -d: -f6 )
+            HOMEDIR=$(eval echo ~$TEST_USER)
             echo "export PATH=\"\$PATH:$(brew --prefix)/bin\"" | sudo tee $HOMEDIR/.bash_profile
           fi
       - name: Set shell

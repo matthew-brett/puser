@@ -62,10 +62,6 @@ jobs:
           ln -s $(which python3) /usr/local/bin/python3
           ln -s $(which python) /usr/local/bin/python
         if: runner.os == 'Linux'
-      - name: Test mac sudo
-        run: |
-          sudo whoami
-        if: runner.os == 'macOS'
       - name: Make user
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
@@ -76,13 +72,13 @@ jobs:
             sudo chmod 755 /usr/share/zsh
             sudo chmod 755 /usr/share/zsh/vendor-completions
           elif [ "$RUNNER_OS" == "macOS" ]; then
-            sudo whoami
-            sudo $GH_WF/make_mac_user.sh $TEST_USER 600
+            sudo sysadminctl -addUser $TEST_USER -password foobar
             # Allow ssh access.
             sudo /usr/sbin/dseditgroup -o edit -a ${TEST_USER} -t user com.apple.access_ssh
             # Configure for homebrew
             echo "export PATH=\"\$PATH:$(brew --prefix)/bin\"" > /tmp/bash_profile
-            sudo -i -u $TEST_USER cp /tmp/bash_profile .bash_profile
+            HOMEDIR=$( getent passwd "$TEST_USER" | cut -d: -f6 )
+            echo "export PATH=\"\$PATH:$(brew --prefix)/bin\"" | sudo tee $HOMEDIR/.bash_profile
           fi
       - name: Set shell
         run: |
